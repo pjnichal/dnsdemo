@@ -1,6 +1,6 @@
 import mongoose, { Schema } from "mongoose";
 
-const dnsrecord = new mongoose.Schema({
+const record = new mongoose.Schema({
   domain: {
     type: String,
     unique: true,
@@ -12,6 +12,6 @@ const dnsrecord = new mongoose.Schema({
   },
 });
 
-const DNSRecord = mongoose.model("DNSRecord", dnsrecord);
+const Record = mongoose.model("Record", record);
 
-export { DNSRecord };
+export { Record };

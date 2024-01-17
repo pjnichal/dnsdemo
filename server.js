@@ -16,8 +16,10 @@ mongoose
   .then(() => console.log("Connected to Mongo DB Successfully."))
   .catch((err) => console.log("Failed to connect with Mongo DB:", err));
 
-app.use("/api", dnsrouter);
-
+app.use("/api/dns1", dnsrouter);
+app.get("/", (req, res) => {
+  res.status(200).json({ status: 200, message: "Server Running" });
+});
 app.all("*", (req, res) => {
   res
     .status(404)

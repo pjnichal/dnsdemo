@@ -1,7 +1,7 @@
 import { Router } from "express";
-import { getDns } from "../controller/dnscontroller.js";
+import { getRecord } from "../controller/dnscontroller.js";
 
 let router = Router();
-router.post("/dns", getDns);
+router.get("/", getRecord);
 
 export default router;
