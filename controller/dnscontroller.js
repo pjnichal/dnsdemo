@@ -1,5 +1,5 @@
 export const getRecord = async (req, res) => {
-  console.log(req.body);
+  console.log(req.params.id);
   return res.send({ message: "Message" });
 };
 export const saveRecord = async (req, res) => {
