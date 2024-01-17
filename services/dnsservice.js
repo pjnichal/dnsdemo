@@ -38,6 +38,7 @@ export const getRecordService = (domain) => {
     if (popularCount == null) {
       await client.hset(domain, "count", 1);
     } else {
+      await client.hincrby(domain, "count", 1);
       if (popularCount > 4) {
         let currData = await client.hget(domain, "data");
         if (currData == null) {
@@ -50,7 +51,7 @@ export const getRecordService = (domain) => {
             from: "From mongo but now stored in redis",
           });
         }
-        await client.hincrby(domain, "count", 1);
+
         return resolve({
           status: 200,
           data: JSON.parse(currData),
@@ -122,7 +123,7 @@ export const updateRecordService = (record) => {
       });
     }
     console.log(recordUpdate);
-    await client.del(domain);
+    await client.del(record.domain);
     return resolve({
       status: 201,
       message: "Record updated successfully",
