@@ -1,21 +1,22 @@
-var dns = require("native-dns");
-var server = dns.createServer();
+// // Use authbind to bind to port 53 without elevated privileges
+// import spawn from "child_process";
+// const authbindPath = "/usr/bin/authbind"; // Adjust the path based on your system
+// const port53 = 53;
 
-server.on("request", function (request, response) {
-  //console.log(request)
-  response.answer.push(
-    dns.A({
-      name: request.question[0].name + "PRAVIN",
-      address: "19.19.19.19",
-      ttl: 600,
-    })
-  );
+// const serverProcess = spawn.spawn(authbindPath, [
+//   `-p${port53}`,
+//   "node",
+//   "dnsserver.js",
+// ]);
 
-  response.send();
-});
+// serverProcess.stdout.on("data", (data) => {
+//   console.log(`stdout: ${data}`);
+// });
 
-server.on("error", function (err, buff, req, res) {
-  console.log(err.stack);
-});
+// serverProcess.stderr.on("data", (data) => {
+//   console.error(`stderr: ${data}`);
+// });
 
-server.serve(15353);
+// serverProcess.on("close", (code) => {
+//   console.log(`child process exited with code ${code}`);
+// });
