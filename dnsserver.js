@@ -11,7 +11,7 @@ server.on("request", function (request, response) {
       ttl: 600,
     })
   );
-  console.log("DNS CALLED");
+  console.log(request);
   response.send();
 });
 
