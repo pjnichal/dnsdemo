@@ -104,7 +104,6 @@ export const deleteRecordService = (domain) => {
 };
 export const updateRecordService = (record) => {
   return new Promise(async (resolve, reject) => {
-    //update from redis
     //update from mongo
     if (!record || !record.domain || !record.ip) {
       console.log(record);
