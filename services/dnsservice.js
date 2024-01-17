@@ -80,7 +80,7 @@ export const updateRecordService = (record) => {
       { domain: record.domain },
       { ...record }
     );
-    if (recordUpdate.matchedCount < 0 || recordUpdate.modifiedCount < 0) {
+    if (recordUpdate.matchedCount == 0 || recordUpdate.modifiedCount == 0) {
       return reject({
         status: 404,
         message: "Record not found",
