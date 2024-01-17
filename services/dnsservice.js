@@ -33,12 +33,10 @@ export const saveRecordService = (record) => {
 };
 export const getRecordService = (domain) => {
   return new Promise(async (resolve, reject) => {
-    //fetch from redis
     let popularCount = await client.hget(`${domain}`, "count");
     if (popularCount == null || popularCount <= 4) {
-      //fetch from mongo
       let record = await Record.findOne({ domain: domain });
-      //update in redis if counter is greater than 4
+
       if (record) {
         if (popularCount > 0) {
           await client.hincrby(domain, "count", 1);
