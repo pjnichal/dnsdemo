@@ -35,9 +35,25 @@ export const getRecordService = (domain) => {
   return new Promise(async (resolve, reject) => {
     //fetch from redis
     let popularCount = await client.hget(`${domain}`, "count");
-    if (popularCount == null) {
-      await client.hset(domain, "count", 1);
+    if (popularCount == null || popularCount <= 4) {
+      //fetch from mongo
+      let record = await Record.findOne({ domain: domain });
+      //update in redis if counter is greater than 4
+      if (record) {
+        if (popularCount > 0) {
+          await client.hincrby(domain, "count", 1);
+        } else {
+          await client.hset(domain, "count", 1);
+        }
+        return resolve({
+          status: 200,
+          data: record,
+          message: "Record fetched successfully",
+          from: "From mongo ",
+        });
+      }
     } else {
+      console.log("INCREW");
       await client.hincrby(domain, "count", 1);
       if (popularCount > 4) {
         let currData = await client.hget(domain, "data");
@@ -59,17 +75,7 @@ export const getRecordService = (domain) => {
           from: "From redis",
         });
       }
-    }
-    //fetch from mongo
-    let record = await Record.findOne({ domain: domain });
-    //update in redis if counter is greater than 4
-    if (record) {
-      return resolve({
-        status: 200,
-        data: record,
-        message: "Record fetched successfully",
-        from: "From mongo ",
-      });
+      ///from mongo
     }
 
     //fetch from dn2
