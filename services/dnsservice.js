@@ -34,27 +34,31 @@ export const saveRecordService = (record) => {
 export const getRecordService = (domain) => {
   return new Promise(async (resolve, reject) => {
     //fetch from redis
-    let popular = await client.get(`domain/${domain}`);
-    if (popular == null) {
-      const data = { count: 0, data: {} };
-      const stringData = JSON.stringify(data);
-      await client.set(`domain`, stringData);
+    let popularCount = await client.hget(`${domain}`, "count");
+    if (popularCount == null) {
+      await client.hset(domain, "count", 1);
     } else {
-      const jsonData = JSON.parse(popular);
-      let count = jsonData.count + 1;
-      if (count > 4 && Object.keys(jsonData.data).length == 0) {
-        console.log("set called");
-        const data = { count: count, data: blogPost };
-        const stringData = JSON.stringify(data);
-        await client.set(`popular:${id}`, stringData);
-      } else {
-        const data = { count: count, data: jsonData.data };
-        console.log(count);
-        const stringData = JSON.stringify(data);
-        await client.set(`popular:${id}`, stringData);
+      if (popularCount > 4) {
+        let currData = await client.hget(domain, "data");
+        if (currData == null) {
+          let record = await Record.findOne({ domain: domain });
+          await client.hset(domain, "data", JSON.stringify(record));
+          return resolve({
+            status: 200,
+            data: record,
+            message: "Record fetched successfully",
+            from: "From mongo but now stored in redis",
+          });
+        }
+        await client.hincrby(domain, "count", 1);
+        return resolve({
+          status: 200,
+          data: JSON.parse(currData),
+          message: "Record fetched successfully",
+          from: "From redis",
+        });
       }
     }
-
     //fetch from mongo
     let record = await Record.findOne({ domain: domain });
     //update in redis if counter is greater than 4
@@ -63,6 +67,7 @@ export const getRecordService = (domain) => {
         status: 200,
         data: record,
         message: "Record fetched successfully",
+        from: "From mongo ",
       });
     }
 
@@ -78,8 +83,9 @@ export const deleteRecordService = (domain) => {
     //delete from redis
     //delete from mongo
     let record = await Record.deleteOne({ domain: domain });
-    //update in redis if counter is greater than 4
+
     if (record.deletedCount > 0) {
+      await client.del(domain);
       return resolve({
         status: 201,
         message: "Record deleted successfully",
@@ -116,6 +122,7 @@ export const updateRecordService = (record) => {
       });
     }
     console.log(recordUpdate);
+    await client.del(domain);
     return resolve({
       status: 201,
       message: "Record updated successfully",
