@@ -2,6 +2,7 @@ import {
   saveRecordService,
   getRecordService,
   deleteRecordService,
+  updateRecordService,
 } from "../services/dnsservice.js";
 
 export const getRecord = async (req, res) => {
@@ -24,8 +25,13 @@ export const saveRecord = async (req, res) => {
     });
 };
 export const updateRecord = async (req, res) => {
-  console.log(req.body);
-  return res.send({ message: "Message" });
+  await updateRecordService(req.body)
+    .then((response) => {
+      return res.status(response.status).json(response);
+    })
+    .catch((err) => {
+      return res.status(err.status).json(err);
+    });
 };
 export const deleteRecord = async (req, res) => {
   console.log(req.params.id);

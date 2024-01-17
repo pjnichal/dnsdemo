@@ -68,22 +68,29 @@ export const updateRecordService = (record) => {
   return new Promise(async (resolve, reject) => {
     //update from redis
     //update from mongo
+    if (!record || !record.domain || !record.ip) {
+      console.log(record);
+      return reject({
+        status: 404,
+        message: "Please enter valid of the record  ",
+      });
+    }
+
     let recordUpdate = await Record.updateOne(
       { domain: record.domain },
       { ...record }
     );
-
-    // if (record.deletedCount > 0) {
-    //   return resolve({
-    //     status: 201,
-    //     message: "Record deleted successfully",
-    //   });
-    // }
-
-    //delete from dn2
-    return reject({
-      status: 404,
-      message: "Record not found",
+    if (recordUpdate.matchedCount < 0 || recordUpdate.modifiedCount < 0) {
+      return reject({
+        status: 404,
+        message: "Record not found",
+      });
+    }
+    console.log(recordUpdate);
+    return resolve({
+      status: 201,
+      message: "Record updated successfully",
     });
+    //update from dn2
   });
 };
