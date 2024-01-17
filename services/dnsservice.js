@@ -51,7 +51,6 @@ export const getRecordService = (domain) => {
         });
       }
     } else {
-      console.log("INCREW");
       await client.hincrby(domain, "count", 1);
       if (popularCount > 4) {
         let currData = await client.hget(domain, "data");
