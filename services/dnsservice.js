@@ -13,7 +13,7 @@ export const saveRecordService = (record) => {
       console.log(error);
       if (error.code === 11000)
         return reject({
-          status: 402,
+          status: 403,
           message: "Record already exists",
         });
       return reject({
