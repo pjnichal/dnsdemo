@@ -83,11 +83,11 @@ export const getRecordService = (domain) => {
 };
 export const deleteRecordService = (domain) => {
   return new Promise(async (resolve, reject) => {
-    //delete from redis
     //delete from mongo
     let record = await Record.deleteOne({ domain: domain });
 
     if (record.deletedCount > 0) {
+      //delete from redis
       await client.del(domain);
       return resolve({
         status: 201,
