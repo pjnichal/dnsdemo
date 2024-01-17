@@ -44,3 +44,46 @@ export const getRecordService = (domain) => {
     });
   });
 };
+export const deleteRecordService = (domain) => {
+  return new Promise(async (resolve, reject) => {
+    //delete from redis
+    //delete from mongo
+    let record = await Record.deleteOne({ domain: domain });
+    //update in redis if counter is greater than 4
+    if (record.deletedCount > 0) {
+      return resolve({
+        status: 201,
+        message: "Record deleted successfully",
+      });
+    }
+
+    //delete from dn2
+    return reject({
+      status: 404,
+      message: "Record not found",
+    });
+  });
+};
+export const updateRecordService = (record) => {
+  return new Promise(async (resolve, reject) => {
+    //update from redis
+    //update from mongo
+    let recordUpdate = await Record.updateOne(
+      { domain: record.domain },
+      { ...record }
+    );
+
+    // if (record.deletedCount > 0) {
+    //   return resolve({
+    //     status: 201,
+    //     message: "Record deleted successfully",
+    //   });
+    // }
+
+    //delete from dn2
+    return reject({
+      status: 404,
+      message: "Record not found",
+    });
+  });
+};
