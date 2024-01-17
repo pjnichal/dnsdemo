@@ -1,7 +1,15 @@
 import { Record } from "../models/dns.js";
+import { client } from "../config/redis.js";
 
 export const saveRecordService = (record) => {
   return new Promise(async (resolve, reject) => {
+    if (!record || !record.domain || !record.ip) {
+      console.log(record);
+      return reject({
+        status: 403,
+        message: "Please enter valid of the record  ",
+      });
+    }
     try {
       const recordStore = Record({ ...record });
       await recordStore.save();
@@ -26,6 +34,27 @@ export const saveRecordService = (record) => {
 export const getRecordService = (domain) => {
   return new Promise(async (resolve, reject) => {
     //fetch from redis
+    let popular = await client.get(`domain/${domain}`);
+    if (popular == null) {
+      const data = { count: 0, data: {} };
+      const stringData = JSON.stringify(data);
+      await client.set(`domain`, stringData);
+    } else {
+      const jsonData = JSON.parse(popular);
+      let count = jsonData.count + 1;
+      if (count > 4 && Object.keys(jsonData.data).length == 0) {
+        console.log("set called");
+        const data = { count: count, data: blogPost };
+        const stringData = JSON.stringify(data);
+        await client.set(`popular:${id}`, stringData);
+      } else {
+        const data = { count: count, data: jsonData.data };
+        console.log(count);
+        const stringData = JSON.stringify(data);
+        await client.set(`popular:${id}`, stringData);
+      }
+    }
+
     //fetch from mongo
     let record = await Record.findOne({ domain: domain });
     //update in redis if counter is greater than 4
@@ -71,7 +100,7 @@ export const updateRecordService = (record) => {
     if (!record || !record.domain || !record.ip) {
       console.log(record);
       return reject({
-        status: 404,
+        status: 403,
         message: "Please enter valid of the record  ",
       });
     }
