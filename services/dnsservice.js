@@ -73,7 +73,6 @@ export const getRecordService = (domain) => {
           from: "From redis",
         });
       }
-      ///from mongo
     }
 
     //fetch from dn2
